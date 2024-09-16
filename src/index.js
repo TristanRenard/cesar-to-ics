@@ -6,18 +6,11 @@ import login from './utils/cesar/login.js'
 dotenv.config()
 
 const getSSID = async () => {
-
   const { browser, page } = await login()
-
   const etd = await getCalendar(page)
 
   generateCalendar(etd)
-
-
   await browser.close()
-
-  // await generateCalendar(data)
-
 }
 
 getSSID()

@@ -4,11 +4,8 @@ import moment from "moment-timezone"
 
 const generateCalendar = async (etd) => {
   try {
-
     const data = JSON.parse(etd)
-
     const calendar = ical()
-
     const localTz = 'Europe/Paris'
 
     data.forEach(course => {
