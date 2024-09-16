@@ -24,7 +24,6 @@ const parseDate = (dateString) => {
     startDate = endDate = new Date(datePart)
   } else if (rangeDateWithYearRegex.test(dateString)) {
     const [, startDay, endPart, year] = rangeDateWithYearRegex.exec(dateString)
-    // The start date uses the same year as the end date
     const [endMonth, endDay] = endPart.split(' ')
     startDate = new Date(`${endMonth} ${startDay}, ${year}`)
     endDate = new Date(`${endPart}, ${year}`)
@@ -49,12 +48,10 @@ const getKeyDates = async (page) => {
 
   console.log("Waiting for page to load...")
 
-  // Wait for the booklet to be visible on the page
   await page.waitForSelector('.booklet.row.g-3')
 
   console.log("Page loaded.")
 
-  // Get all booklet phases
   const phases = await page.$$('.booklet-phase')
 
   console.log("Extracting key dates...")
@@ -64,10 +61,9 @@ const getKeyDates = async (page) => {
   for (const phase of phases) {
     const titleElement = await phase.$('.card-title')
     const rawDateText = await phase.$eval('.card-text', el => el.textContent)
-    const dateText = normalizeText(rawDateText) // Normalize the text
+    const dateText = normalizeText(rawDateText)
     const backgroundColor = await phase.evaluate(el => el.style.backgroundColor)
 
-    // Extracting title and optional link
     let title = (await titleElement.evaluate(el => el.textContent)).trim()
     const linkElement = await titleElement.$('a')
     let link = null
@@ -76,10 +72,8 @@ const getKeyDates = async (page) => {
       link = await linkElement.evaluate(el => el.href)
     }
 
-    // Extracting the description from the data-bs-title attribute
     const description = await titleElement.evaluate(el => el.getAttribute('data-bs-title')) || 'Pas de description.'
 
-    // Parsing the dates using the improved parseDate function
     const { startDate, endDate } = parseDate(dateText)
 
     if (startDate && endDate) {
@@ -97,7 +91,6 @@ const getKeyDates = async (page) => {
     }
   }
 
-  // Create iCalendar
   const calendar = ical()
   const localTz = 'Europe/Paris'
 
@@ -112,7 +105,6 @@ const getKeyDates = async (page) => {
     })
   })
 
-  // Create output directory if it doesn't exist
   try {
     await fs.access('output')
   } catch (error) {
@@ -121,7 +113,6 @@ const getKeyDates = async (page) => {
     }
   }
 
-  // Save the calendar to a file
   await fs.writeFile('output/calendarKeyDates.ics', calendar.toString(), 'utf-8')
   console.log('Calendar saved as output/calendarKeyDates.ics')
 }
