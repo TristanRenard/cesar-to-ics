@@ -29,7 +29,6 @@ const generateCalendar = async (etd) => {
       })
     })
 
-    //check if folder output exists
     try {
       await fs.access('output')
     } catch (error) {
